@@ -2,8 +2,9 @@
 %输入参数：动目标阈值Thres，雷达数据Data,起始位置Begin,终止位置Over,雷达位置标识RadarPosiMark,分辨率Resol,最小偏置CoorOffset
 %输出参数：动目标在全局坐标系下的坐标MovCoor
 %程序原理：利用径向速度重构雷达速度（取所有速度的平均值），如果有偏离平均值很大的点，就视为动目标
+% function [MovCoor,V_Rec,V_Ave,MovIndex]=MovObj_Detect(Thres,Data,Begin,Over,RadarPosiMark,Resol,CoorOffset)
 
-function MovCoor=MovObj_Detect(Thres,Data,Begin,Over,RadarPosiMark,Resol,CoorOffset)
+function [MovCoor,MovIndex]=MovObj_Detect(Thres,Data,Begin,Over,RadarPosiMark,Resol,CoorOffset)
 %% 记录所有时刻重构的雷达速度，取平均值视为雷达速度
 V=cell(size(Data.Radar));
 V_Rec=0;       %记录全部的投影速度
@@ -14,6 +15,7 @@ for i=Begin:Over                  %每一个时间点
     end
     yaw=Data.Yaw(i)-Data.Yaw(1);
     for j=1:size(Data.Radar{i},1)   %每一个点云内部
+%         V{i}(j,:)=get_motion_speed(Data.Radar{i}(j,1),Data.Radar{i}(j,2),Data.Radar{i}(j,3),Data.Radar{i}(j,4));%测试师兄代码
         V{i}(j,:)=V_Building(Data.Radar{i}(j,4),Data.Radar{i}(j,1),Data.Radar{i}(j,2),Data.Radar{i}(j,3),yaw,RadarPosiMark);
         V_Rec=[V_Rec;V{i}(j,:)];
     end
